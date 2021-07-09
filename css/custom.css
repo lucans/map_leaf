@@ -1,0 +1,102 @@
+	#mapid {
+	   		z-index: 999;
+	   		height: 100vh; 
+	   	}
+
+	   	body{ 
+	   		margin: 0;	   	
+		    font-family: Roboto, Arial, sans-serif;
+	   	}
+
+	   	.ranking{
+	   		margin: 1em;
+	   		z-index: 1000;
+	   		position: absolute;
+	   		background-color: white;
+	   		border-radius: 3px;
+	   		border-radius: 3px;
+	   		width: 400px;
+	   	}
+
+	   	.leaflet-marker-icon{
+	   		border-radius: 100px;
+	   	}
+
+	   	.ranking-list li{
+	   		padding: 1rem 0.8em;
+	   		letter-spacing: 1px;
+	   		text-decoration: none;
+	   		color: white;
+	   	}
+
+
+
+	   	ul {
+		    display: block;
+		    list-style-type: disc;
+		    margin-block-start: 0em;
+		    margin-block-end: 0em;
+		    margin-inline-start: 0px;
+		    margin-inline-end: 0px;
+		    padding-inline-start: 0px;
+		}
+
+	   	.ranking-title{
+	   		padding: 3px;
+	   		border: 1px solid #f0f0f0;
+	   		text-transform: uppercase;
+	   		border-radius: 3px;
+	   		font-weight: bold;
+	   		font-size: 1em;
+	   	}
+
+	   	.ranking .title{
+	   		letter-spacing: 3px;
+		    text-align: center;
+		    font-size: 1.2em;
+	   	}
+
+	   	.ranking-total{
+	   		font-weight: bold;
+	   		letter-spacing: none;
+	   		font-size: 1em;
+	   		float: right;
+	   		background-color: #424242;
+	   		border-radius: 3px;
+	   		padding: 1px;
+	   		text-transform: unset;
+	   	}
+
+	   	.br1{
+	   		background-color: #f9a825;
+	   	}   			
+	   	.la1{
+	   		background-color: #4CAF50;
+		}	
+	   	.la2{
+	   		background-color: #00bcd4;
+	   	}
+	   	.na1{
+	   		background-color: #f4511e;   			
+	   	}
+		.euw1{
+	   		background-color: #ea80fc;   			
+		}
+	   	.eun1{
+	   		background-color: #009688;
+	   	}	
+		.ru{
+	   		background-color: #F44336;   			
+		}
+	   	.tr1{
+	   		background-color: #3f51b5;   			
+	   	}
+	   	.jp1{
+	   		background-color: #e91e63;   			
+	   	}
+	   	.kr{
+	   		background-color: #7c4dff;
+	   	}
+	   	.oc1{
+	   		background-color: #00897b;
+	   	}
