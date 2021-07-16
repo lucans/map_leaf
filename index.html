@@ -8,6 +8,12 @@
 	<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.0.2/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-EVSTQN3/azprG1Anm3QDgpJLIm9Nao0Yz1ztcQTwFspd3yD65VohhpuuCOmLASjC" crossorigin="anonymous">
 	<link rel="stylesheet" type="text/css" href="css/color.css">
 	<style type="text/css">
+		.index-1100{
+			z-index: 1100;
+		}
+		.index-1200{
+			z-index: 1200;
+		}
 	   	#mapid {
 	   		z-index: 999;
 	   		height: 100vh; 
@@ -15,8 +21,6 @@
 
 	   	.ranking{
 	   		z-index: 1100;
-	   		background-color: white;		
-	   		position: absolute;
 	   	}
 
 	   	.leaflet-marker-icon{
@@ -30,48 +34,11 @@
 		    font-size: 1.2rem;
 		    background-color: #212121;
 	   	}
-
-	   	.ranking-region-name{
-	   		font-size: 1.2em;
-	   		text-align: center;
-	   	}
-	
-	   	.ranking-list .ranking-code{
-	   		color: white;
-	   	}	   	
-
-	   	.ranking-code{
-	   		padding: 6px;
-	   		text-transform: uppercase;
-	   		border-radius: 3px;
-	   		border-radius: 100px;
-	   		border-bottom-left-radius: 3px;
-	   	}
-
+  
 	   	.ranking .title{
 		    text-align: center;
 		    font-size: 1.2rem;
 	   	}
-
-	   	.ranking-total{
-	   		font-weight: bold;
-	   		font-size: 1em;
-	   		float: right;
-	   		color: #424242;
-	   		border-radius: 3px;
-	   		text-transform: unset;
-	   		padding: 6px 3px;
-	   	}
-
-	   	.ranking-position-ball{
-	   		padding: 0.6em;
-	   		margin: 3px 6px;
-	   		font-size: 0.8em;
-	   		font-weight: bold;
-	   		border-radius: 100px;
-	   		background-color: darkgrey;
-	   	}
-
 
 	   	.badge{
 	   		text-transform: uppercase;
@@ -82,67 +49,67 @@
 	   		background-color: #f9a825;
 	   	} 
 	   	.accordion-item.br1 {
-	   		border-left: 1.2rem solid #f9a825 !important;
+	   		border-left: 1rem solid #f9a825 !important;
 		}	
 	   	.la1{
 	   		background-color: #4CAF50;
 		}	
 	   	.accordion-item.la1 {
-	   		border-left: 1.2rem solid #4CAF50 !important;
+	   		border-left: 1rem solid #4CAF50 !important;
 		}	
 	   	.la2{
 	   		background-color: #00bcd4;
 	   	}
 	   	.accordion-item.la2 {
-	   		border-left: 1.2rem solid #00bcd4 !important;
+	   		border-left: 1rem solid #00bcd4 !important;
 		}	
 	   	.na1{
 	   		background-color: #f4511e;
 	   	}
 	   	.accordion-item.na1 {
-	   		border-left: 1.2rem solid #f4511e !important;
+	   		border-left: 1rem solid #f4511e !important;
 		}	
 		.euw1{
 			background-color: #ea80fc;
 		}
 		.accordion-item.euw1 {
-			border-left: 1.2rem solid #ea80fc !important;
+			border-left: 1rem solid #ea80fc !important;
 		}	
 	   	.eun1{
 	   		background-color: #42a5f5;
 	   	}	
 	   	.accordion-item.eun1 {
-	   		border-left: 1.2rem solid #42a5f5 !important;
+	   		border-left: 1rem solid #42a5f5 !important;
 		}	
 		.ru{
 			background-color: #F44336;
 		}
 		.accordion-item.ru {
-			border-left: 1.2rem solid #F44336 !important;
+			border-left: 1rem solid #F44336 !important;
 		}	
 	   	.tr1{
 	   		background-color: #3f51b5;
 	   	}
 	   	.accordion-item.tr1 {
-	   		border-left: 1.2rem solid #3f51b5 !important;
+	   		border-left: 1rem solid #3f51b5 !important;
 		}	
 	   	.jp1{
 	   		background-color: #e91e63;
 	   	}
 	   	.accordion-item.jp1 {
-	   		border-left: 1.2rem solid #e91e63 !important;
+	   		border-left: 1rem solid #e91e63 !important;
 		}	
 	   	.kr{
 	   		background-color: #7c4dff;
 	   	}
 	   	.accordion-item.kr {
-	   		border-left: 1.2rem solid #7c4dff !important;
+	   		border-left: 1rem solid #7c4dff !important;
 		}	
 	   	.oc1{
 	   		background-color: #00897b;
 	   	}
 	   	.accordion-item.oc1 {
-	   		border-left: 1.2rem solid #00897b !important;
+	   		border-left: 1rem solid #00897b !important;
 		}	
 		.summoner-icon{
 			border-radius: 100%;
@@ -164,25 +131,43 @@
 </head>
 
 <body>
-	<div class="ranking col-sm-4">
-	 	<div class="title">
-	 		<i class="fas fa-medal"></i> 
-	 		<label>Ranking Hyper Roll</label>
-	 	</div>
+	<div class="container-fluid">
+		<div class="row">
 
-	 	<center>		 		
-		 	<div class="spinner-border text-primary m-5" id="spinner-loading" role="status"></div>
-	 	</center>
+			<div class="col-12 m-4 position-absolute index-1100">
 
-		<div class="ranking-list accordion accordion-flush" id="accordionRankingRegion">
-			<div class="row">
-				
+			 	<div class="ranking col position-absolute">		 	
+				 	<div class="title">
+				 		<i class="fas fa-medal"></i> 
+				 		<label>Ranking Hyper Roll</label>
+				 	</div>
+
+				 	<center>		 		
+					 	<div class="spinner-border text-primary m-5" id="spinner-loading" role="status"></div>
+				 	</center>
+
+					<div class="ranking-list accordion accordion-flush" id="accordionRankingRegion">
+						<!-- <div class="row"></div> -->
+					</div>
+			 	</div>
+
+			 	<div class="col float-end position-absolute">
+			 		<div class="card" style="width: 18rem;">
+					  <img src="" class="card-img-top" alt="">
+					  <div class="card-body">
+					    <h5 class="card-title">Card title</h5>
+					    <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
+					    <a href="#" class="btn btn-primary">Go somewhere</a>
+					  </div>
+					</div>
+			 	</div>
 			</div>
-		</div>
-	</div>
 
-	<div class="row">
-		<div class="col-xs-12" id="mapid"></div>
+
+			<div id="mapid">
+			</div>
+
+		</div>
 	</div>
 </body>
 

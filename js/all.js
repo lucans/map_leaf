@@ -3,23 +3,24 @@ $("#accordionRankingRegion").hide();
 
 const SERVER_PATH = "http://localhost/map_leaf/server/";
 const SUMMONER_ICON_PATH = "https://ddragon.leagueoflegends.com/cdn/11.14.1/img/profileicon/";
-const LIMIT_GENERATE_SUMMONERS = 25;
+const LIMIT_GENERATE_SUMMONERS = 10;
 
 var aRegions = new Array(
+		'br1',
+		'la1',
+		'la2',
 		'kr',
 		'euw1',
 		'na1',
 		'eun1',
 		'oc1',
-		'la2',
-		'br1',
-		'la1',
 		'jp1',
 		'tr1',
 		'ru'
 );
 
 var aRegionsOptions = new Array();
+var allHyperRollList = new Array();
 
 aRegions.forEach(function(region, index){
 	aRegionsOptions[region] = new Array('options');
@@ -37,11 +38,11 @@ $(document).ready(function() {
     	zoom: 3
 	});
 
-	var link_map = 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'
+	// var link_map = 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'
 	// let link_map =  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 	// var link_map = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 	// var link_map = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-	// var link_map = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+	var link_map = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
 
 	L.tileLayer(link_map, {
 	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery <a href="https://www.mapbox.com/">Mapbox</a>',
@@ -53,41 +54,46 @@ $(document).ready(function() {
 
 		getHyperRollList(region).done(function(aHyperRollList){
 
-			aHyperRollList.forEach(function(summoner, index){
+			allHyperRollList.push(aHyperRollList);
 
-				if(index <= LIMIT_GENERATE_SUMMONERS){
+			allHyperRollList.sort(function(a, b){return b.totalRegion-a.totalRegion});
 
-						let randomCoordinate = getRandomJSONCoordinate(region);
-						let iconOptions = getHyperRollBadgeByPosition(index);
+				aHyperRollList.forEach(function(summoner, index){
 
-				   		let iconStyle = L.icon({
-				   			iconUrl: 'img/' + iconOptions[0] + '.png',
-				   			iconSize:     [20 + iconOptions[1], 20 + iconOptions[1]],
-						    shadowSize:   [20 + iconOptions[1], 20 + iconOptions[1]], 
-						    iconAnchor:   [20 + iconOptions[1], 20 + iconOptions[1]], 
-						    shadowAnchor: [0,0], 
-						    popupAnchor:  [0,0],
-						    zIndexOffset: 1100 + iconOptions[1],
-						    className: summoner.summonerId
-				   		})
+					if(index <= LIMIT_GENERATE_SUMMONERS){
 
-				   		$(".leaflet-marker-icon ." + summoner.summonerId).click(function(){
-				   			setHTMLTopSummonerRegion(region);
-				   			zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, 6);
-				   			$("#collapse-" + region).collapse();
-				   		})
+							let randomCoordinate = getRandomJSONCoordinate(region);
+							let iconOptions = getHyperRollBadgeByPosition(index);
+
+					   		let iconStyle = L.icon({
+					   			iconUrl: 'img/' + iconOptions[0] + '.png',
+					   			iconSize:     [20 + iconOptions[1], 20 + iconOptions[1]],
+							    shadowSize:   [20 + iconOptions[1], 20 + iconOptions[1]], 
+							    iconAnchor:   [20 + iconOptions[1], 20 + iconOptions[1]], 
+							    shadowAnchor: [0,0], 
+							    popupAnchor:  [0,0],
+							    zIndexOffset: 1100 + iconOptions[1],
+							    className: summoner.summonerId
+					   		})
+
+					   		$(".leaflet-marker-icon ." + summoner.summonerId).click(function(){
+					   			setHTMLTopSummonerRegion(region);
+					   			zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, 6);
+					   			$("#collapse-" + region).collapse();
+					   		})
 
 
-						let marker = L.marker([randomCoordinate.lat, randomCoordinate.lon], {icon: iconStyle})		   
-						.addTo(mymap)
+							let marker = L.marker([randomCoordinate.lat, randomCoordinate.lon], {icon: iconStyle})		   
+							.addTo(mymap)
 
-						if(index <= 10){
-							marker.bindTooltip(summoner.summonerName + " LP: " + summoner.ratedRating, {permanent: true, direction: 'bottom'}).openTooltip();
-						}
+							if(index <= 10){
+								marker.bindTooltip(summoner.summonerName + " LP: " + summoner.ratedRating, {permanent: true, direction: 'bottom'}).openTooltip();
+							}
 
-						setSummonerTopRankingProfile(region, summoner.summonerId);
-				}
-			})
+							setSummonersProfileIcon(region, summoner.summonerId);
+					}
+				})
+
 		})
 
 		drawRegionArea(region);
@@ -198,13 +204,16 @@ function getHyperRollList(region){
 
 	let allHyperRoll = new Array(region);
 
-	return $.getJSON("json/hyperroll/" + region + ".json", function(){ 		
-	}).done(function(hyperrollJsonResult){
-		return hyperrollJsonResult;
-	}).fail(function(hyperrollJsonResult){ 		
-		return getHyperRollFromAPI(region);
-	})
-
+	return $.getJSON("json/hyperroll/" + region + ".json", function(){
+		
+			}).done(function(hyperrollJsonResult){
+				hyperrollJsonResult['totalRegion'] = hyperrollJsonResult.reduce((sum, value) => sum + value.ratedRating, 0);
+				return hyperrollJsonResult;
+			}).fail(function(hyperrollJsonResult){
+				return getHyperRollFromAPI(region).done(function(hyperRollResult){
+					return hyperRollResult;
+				});
+			})
 }
 
 function getRandomJSONCoordinate(region, zoomIt = false){
@@ -329,16 +338,14 @@ function setHTMLRankingRegions(region, index){
 		let totalRegion = 0;
 
 		getHyperRollList(region).done(function(aHyperRollList){
-	
-			totalRegion = aHyperRollList.reduce((sum, value) => sum + value.ratedRating, 0);
-	
+
 			$(".ranking-list")
 			.append(
 				"<div class='accordion-item " + region + "'>" +
 					"<h2 class='accordion-header' id='heading-" + region + "'>" +
 					  "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#collapse-" + region + "' aria-expanded='true' aria-controls='collapse-" + region + "'>" +
 					    "<span class='fs-6 fw-bold float-start text-dark'> " + getAreaInfo(region, "name") + "</span>" + 
-					    "<span class='badge float-end text-dark'>" + getNumberToK(totalRegion) + " Points</span>" +
+					    "<span class='badge text-dark'>" + getNumberToK(aHyperRollList.totalRegion) + " Points</span>" +
 					  "</button>" +
 					"</h2>" +
 					"<div id='collapse-" + region + "' class='accordion-collapse collapse' aria-labelledby='heading-" + region + "' data-bs-parent='#accordionRankingRegion'>"+				 
@@ -357,8 +364,6 @@ function setHTMLRankingRegions(region, index){
 			$("#spinner-loading").hide();
 			$("#accordionRankingRegion").fadeIn();
 		})
-	
-
 
 }
 
@@ -379,7 +384,7 @@ function setHTMLTopSummonerRegion(region){
 							  "<div class='card-body'>" +
 							  "<i class='far fa-star text-warning float-end'></i>" +
 							    "<h5 class='card-title'><img class='img-rounded summoner-icon " + summoner.summonerId + "' height='75px' src='" + SUMMONER_ICON_PATH + "3667.png' class='rounded' alt='" +  summoner.summonerName + "'/></h5>" +
-							    "<p class='badge card-text text-dark " + region + "'>" + summoner.summonerName + "</p>" +
+							    "<p class='badge card-text text-light " + region + "'>" + summoner.summonerName + "</p>" +
 							    "<p><span class='badge text-dark'><i class='fas fa-bolt'></i> "  + summoner.ratedRating + "</span></p>" +
 							  "</div>" +
 
@@ -397,7 +402,7 @@ function setHTMLTopSummonerRegion(region){
 
 				}
 				// Seta icone dos summoners
-			   	setSummonerTopRankingProfile(region, summoner.summonerId);
+			   	setSummonersProfileIcon(region, summoner.summonerId);
 
 			})
 		})
@@ -406,7 +411,7 @@ function setHTMLTopSummonerRegion(region){
 	}
 }
 
-function setSummonerTopRankingProfile(region, summonerId){
+function setSummonersProfileIcon(region, summonerId){
 
 	$.getJSON("json/summoners/" + summonerId + ".json", function(summonerJsonResult){
  	
@@ -478,8 +483,8 @@ function getHyperRollFromAPI(region){
 		  	data: {
 	  	},
 	  	success: function(hyperRollResult) {
-	  		console.log("API Sucesso importou HyperRoll de" + region);
-	    	return JSON.parse(hyperRollResult);
+	  		console.log("API Sucesso importou HyperRoll de " + region);
+	    	return hyperRollResult;
 	  	}
 
 	});
