@@ -1,33 +1,29 @@
 $("#spinner-loading").show();
+$(".sumonner-details").hide();
 $("#accordionRankingRegion").hide();
 
-const SERVER_PATH = "http://localhost/map_leaf/server/";
+const SERVER_PATH = "./server/";
 const SUMMONER_ICON_PATH = "https://ddragon.leagueoflegends.com/cdn/11.14.1/img/profileicon/";
-const LIMIT_GENERATE_SUMMONERS = 10;
+const LIMIT_GENERATE_SUMMONERS = 4;
 
 var aRegions = new Array(
-		'br1',
-		'la1',
-		'la2',
 		'kr',
 		'euw1',
 		'na1',
 		'eun1',
 		'oc1',
+		'la2',
+		'br1',
+		'la1',		
 		'jp1',
 		'tr1',
 		'ru'
 );
 
+var lastTotal = 0;
+
 var aRegionsOptions = new Array();
 var allHyperRollList = new Array();
-
-aRegions.forEach(function(region, index){
-	aRegionsOptions[region] = new Array('options');
-	aRegionsOptions[region] = new Array('coordinates');
-	aRegionsOptions[region] = new Array('summoners');	   
-	aRegionsOptions[region]['options'] = getAreaInfo(region, 'theme');	
-})
 
 var mymap = {};
 
@@ -38,25 +34,25 @@ $(document).ready(function() {
     	zoom: 3
 	});
 
-	// var link_map = 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'
+	var link_map = 'https://{s}.tile-cyclosm.openstreetmap.fr/cyclosm/{z}/{x}/{y}.png'
 	// let link_map =  'https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}'
 	// var link_map = 'https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}'
 	// var link_map = 'https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png'
-	var link_map = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
+	// var link_map = 'https://tiles.stadiamaps.com/tiles/alidade_smooth_dark/{z}/{x}/{y}{r}.png'
 
 	L.tileLayer(link_map, {
 	    attribution: 'Map data &copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors, Imagery <a href="https://www.mapbox.com/">Mapbox</a>',
 	    maxZoom: 8,
-	    minZoom: 3,
+	    minZoom: 2,
 	}).addTo(mymap);
 
 	aRegions.forEach(function(region, index){
 
 		getHyperRollList(region).done(function(aHyperRollList){
 
-			allHyperRollList.push(aHyperRollList);
-
-			allHyperRollList.sort(function(a, b){return b.totalRegion-a.totalRegion});
+			allHyperRollList.push(aHyperRollList.sort(function(a, b){
+				return b.totalRegion-a.totalRegion
+			}));
 
 				aHyperRollList.forEach(function(summoner, index){
 
@@ -75,13 +71,6 @@ $(document).ready(function() {
 							    zIndexOffset: 1100 + iconOptions[1],
 							    className: summoner.summonerId
 					   		})
-
-					   		$(".leaflet-marker-icon ." + summoner.summonerId).click(function(){
-					   			setHTMLTopSummonerRegion(region);
-					   			zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, 6);
-					   			$("#collapse-" + region).collapse();
-					   		})
-
 
 							let marker = L.marker([randomCoordinate.lat, randomCoordinate.lon], {icon: iconStyle})		   
 							.addTo(mymap)
@@ -112,6 +101,8 @@ $(document).ready(function() {
 
 	document.cookie = "SameSite=Strict";
 
+	$("#mapid").fadeIn();
+	
 })// FINAL DOCUMENT READY
 
 
@@ -151,7 +142,7 @@ function getJSON(path, fileName){
 
 	}).fail(function(){
 
-	    console.log("Erro ao ler JSON -- " + "json/" + path + fileName + ".json");
+	    console.log("Erro ao ler JSON - " + "json/" + path + fileName + ".json");
 
 	}).always(function(jsonFile){
 		console.log(jsonFile.coordinates[1]);
@@ -211,6 +202,10 @@ function getHyperRollList(region){
 				return hyperrollJsonResult;
 			}).fail(function(hyperrollJsonResult){
 				return getHyperRollFromAPI(region).done(function(hyperRollResult){
+					// console.log(hyperRollResult)
+					// hyperRollResult.forEach(function(summoner, index){
+
+					// })
 					return hyperRollResult;
 				});
 			})
@@ -247,7 +242,7 @@ function getAreaInfo(region, info){
 	if(info == 'theme'){   		
 		switch(region){
 			case 'br1':
-				return "#f9a825";   			
+				return "#f57f17";   			
 			case 'la1':
 				return "#4CAF50";   			
 			case 'la2':
@@ -301,17 +296,17 @@ function getAreaInfo(region, info){
 	} else if(info == 'zoom'){
 	switch(region){
 			case 'br1':
-				return "5";   			
+				return "4";   			
 			case 'la1':
 				return "4";   			
 			case 'la2':
 				return "4";   			
 			case 'na1':
-				return "4";   			
+				return "3";   			
 			case 'euw1':
-				return "6";   			
+				return "5";   			
 			case 'eun1':
-				return "6";   			
+				return "5";   			
 			case 'ru':
 				return "3";   			
 			case 'tr1':
@@ -321,17 +316,53 @@ function getAreaInfo(region, info){
 			case 'kr':
 				return "7";			
 			case 'oc1':
-				return "5";
+				return "4";
 			default:
-				return "6";
+				return "4";
 		}
+	} else if(info == 'region_path'){
+      if(region == 'br1' || region == 'na1' || region == 'la1' || region == 'la2'){
+		  return 'americas';
+		} else if(region == 'eun1' || region == 'euw1' || region == 'tr1' || region == 'ru'){
+		  return 'europe';
+	    } else {
+			return 'asia';
+		}
+	} else if(info == 'totalRegion'){
+		let totalRegion = 0;
+		    return getHyperRollList(region).done(function(hyperrollJsonResult){
+			    totalRegion = hyperrollJsonResult.reduce((sum, value) => sum + value.ratedRating, 0);
+			    return totalRegion;
+		    })
 	}
+
 }
 
 function getNumberToK(n){
 	return Math.round(n / 1000) + "K";
 }
 
+function setHTMLSummonerDetails(region, summonerId, puuid){
+
+	$.getJSON("json/summoners/" + summonerId.toLowerCase() + ".json", function(summonerJsonResult){
+ 	
+	}).done(function(summonerJsonResult){
+		$(".sumonner-details .card").empty().append("<img class='img-rounded card-img-top " + summonerJsonResult.id + "' src='" + SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + ".png' style='heigth: 4rem' class='rounded' alt='" +  summonerJsonResult.name + "'/>" +
+						  "<div class='card-body'>" +
+							"<h5 class='card-title'>" + summonerJsonResult.name + "</h5>" +
+							"<p class='card-text'><i class='fas fa-bolt'></i></p>" +
+							"<a href='#' class='btn btn-primary'>Get moar</a>" +
+						  "</div>"
+		);
+
+		setHTMLSummonerLastMatchs('', region, summonerId, puuid);
+		
+	}).fail(function(summonerJsonResult){
+		
+	})
+
+
+}
 function setHTMLRankingRegions(region, index){
 
 		let firstInRankClass = (index == 0) ? "first-in-ranking" : "";
@@ -341,17 +372,22 @@ function setHTMLRankingRegions(region, index){
 
 			$(".ranking-list")
 			.append(
-				"<div class='accordion-item " + region + "'>" +
+				"<div class='accordion-item " + region + " animate__animated animate__bounceInLeft'>" +
 					"<h2 class='accordion-header' id='heading-" + region + "'>" +
 					  "<button class='accordion-button collapsed' type='button' data-bs-toggle='collapse' data-bs-target='#collapse-" + region + "' aria-expanded='true' aria-controls='collapse-" + region + "'>" +
-					    "<span class='fs-6 fw-bold float-start text-dark'> " + getAreaInfo(region, "name") + "</span>" + 
+					  	
+					    "<span class='badge text-light m-1 text-uppercase " + region + "'>" + region + "</span>" + 
+					   	"<span class='fs-5 fw-bold float-start text-dark'> " + getAreaInfo(region, "name") + "</span>" + 
 					    "<span class='badge text-dark'>" + getNumberToK(aHyperRollList.totalRegion) + " Points</span>" +
+
 					  "</button>" +
 					"</h2>" +
 					"<div id='collapse-" + region + "' class='accordion-collapse collapse' aria-labelledby='heading-" + region + "' data-bs-parent='#accordionRankingRegion'>"+				 
-						"<div class='row d-print-inline-flex'>" +				  
-							 "<div class='row-ranking-top-3'></div>" +				  
-						"</div>"+
+					
+						"<ol class='list-group  list-group-numbered list-" + region + "'></ol>" +
+
+						"</ol>" +
+
 					"</div>"+
 				"</div>")
 
@@ -359,9 +395,10 @@ function setHTMLRankingRegions(region, index){
 				let randomCoordinate = getRandomJSONCoordinate(region);
 				zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, getAreaInfo(region, 'zoom'));
 				setHTMLTopSummonerRegion(region);
+				$(".list-group-numbered.list-" + region).show();
 			})
 
-			$("#spinner-loading").hide();
+			$("#spinner-loading").hide();			
 			$("#accordionRankingRegion").fadeIn();
 		})
 
@@ -369,7 +406,7 @@ function setHTMLRankingRegions(region, index){
 
 function setHTMLTopSummonerRegion(region){
 
-	if($("." + region + " .row-ranking-top-3").text() <= 0){
+	if($(".list-group-numbered.list-" + region).text() <= 0){
 
 		getHyperRollList(region).done(function(aHyperRollList){
 
@@ -377,23 +414,18 @@ function setHTMLTopSummonerRegion(region){
 
 				if(index < 3){
 
-			   		$("." + region + " .row-ranking-top-3").append(
-			   			"<div class='col-sm-4'>" +
-			   				"<div class='card text-center'>" +
-						
-							  "<div class='card-body'>" +
-							  "<i class='far fa-star text-warning float-end'></i>" +
-							    "<h5 class='card-title'><img class='img-rounded summoner-icon " + summoner.summonerId + "' height='75px' src='" + SUMMONER_ICON_PATH + "3667.png' class='rounded' alt='" +  summoner.summonerName + "'/></h5>" +
-							    "<p class='badge card-text text-light " + region + "'>" + summoner.summonerName + "</p>" +
-							    "<p><span class='badge text-dark'><i class='fas fa-bolt'></i> "  + summoner.ratedRating + "</span></p>" +
-							  "</div>" +
-
-							  "<div class='card-footer text-muted p-1'>" +
-								"<button class='btn btn-secondary'><i class='fas fa-map-marker-alt'></i></button>" +																			
-	 						  "</div>" +
-
-						  	"</div>" +
-						"</div>"
+			   		$(".list-group-numbered.list-" + region).append(
+						   
+						"<li class='list-group-item d-flex justify-content-between align-items-start'>" +
+                            "<div class='row'>" +
+                            "<div class='ms-2 me-auto'>" +
+						       "<img class='img-rounded summoner-icon " + summoner.summonerId + "' height='100px' src='" + SUMMONER_ICON_PATH + "3667.png' class='rounded' alt='" +  summoner.summonerName + "'/>" +
+                               "<div class='" + region + " fs-6 text-light text-center fw-bold'>" + summoner.summonerName + "</div>" +
+							     
+                            "</div>" +
+                            "</div>" +
+                            "<span class='badge " + region + " rounded-pill fs-6'><i class='fas fa-bolt'></i> " + summoner.ratedRating + "</span>" +
+                        "</li>" 
 			   		)
 
 			   		$("button." + summoner.summonerId).click(function(){
@@ -401,6 +433,7 @@ function setHTMLTopSummonerRegion(region){
 					});
 
 				}
+
 				// Seta icone dos summoners
 			   	setSummonersProfileIcon(region, summoner.summonerId);
 
@@ -413,24 +446,44 @@ function setHTMLTopSummonerRegion(region){
 
 function setSummonersProfileIcon(region, summonerId){
 
-	$.getJSON("json/summoners/" + summonerId + ".json", function(summonerJsonResult){
+	$.getJSON("json/summoners/" + summonerId.toLowerCase() + ".json", function(summonerJsonResult){
  	
 	}).done(function(summonerJsonResult){
-		$("img." + summonerId).attr('src', SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + '.png');		
+			$("img." + summonerId).attr('src', SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + '.png')
+			$("img." + summonerId).click(function(){
+				// openSummonerModal('right', region, summonerJsonResult.id, summonerJsonResult.puuid);
+				getSummonerMatchsStats(region, summonerJsonResult.id, summonerJsonResult.puuid);
+				setHTMLSummonerDetails(region, summonerJsonResult.id, summonerJsonResult.puuid);
+				$(".sumonner-details").fadeIn();
+			})
 	}).fail(function(summonerJsonResult){
 		getSummonerFromAPI(region, summonerId);
 	})
 
 }
 
-function setHTMLSearchServerOption(){
+function setHTMLSummonerLastMatchs(position, region, summonerId, puuid, limit = 10){
 
-	aRegions.forEach(function(region){
-	$(".search .region-select")
-		.append(
-			"<option class='" + region + "'>" + region + "</option>"
-		);
-	})
+    let path = "/tft/match/v1/matches/by-puuid/" + puuid + "/ids?count=" + limit;
+	let savePath = "/matchs/" + summonerId;
+	let regionPath = getAreaInfo(region, 'region_path');
+
+	return getAPI(regionPath, path, savePath)
+	.done(function(aMatchsResult){
+		JSON.parse(aMatchsResult).forEach(function(match, index){
+			getAPI(regionPath, '/tft/match/v1/matches/' + match, '')
+			.done(function(aMatchResult){
+
+				JSON.parse(aMatchResult).info.participants.forEach(function(participant, index){
+					if(participant.id == summonerId){
+
+						$(".sumonner-details .card .card-body .card-text").append("<p>" + participant.companion.species + "<span class='badge text-danger'>Damage: " + total_damage_to_players +"</span></p>")
+					}
+				})
+
+				})
+			});
+		})
 
 }
 
@@ -438,17 +491,72 @@ function zoomMapIn(lat, lon, zoom){
 	mymap.flyTo([lat, lon], zoom);
 }
 
+function getSummonerMatchsStats(region, summonerId, puuid, limitMatchs = 5){
+
+	let path = "/tft/match/v1/matches/by-puuid/" + puuid + "/ids?count=" + limitMatchs;
+	let regionPath = getAreaInfo(region, 'region_path');
+    let aPetsUsed = new Array();
+    let aPetsUsedCount = new Array();
+	var dfd = jQuery.Deferred();
+
+	getAPI(regionPath, path)
+	.done(function(aMatchsResult){
+		JSON.parse(aMatchsResult).forEach(function(match, index){
+			getAPI(regionPath, '/tft/match/v1/matches/' + match)
+			.done(function(aMatchResult){
+
+			    JSON.parse(aMatchResult).info.participants.forEach(function(participant, index){
+				    
+					aPetsUsedCount[participant.companion.species] = new Int32Array;
+
+                    if(aPetsUsed.indexOf(participant.companion.species) < 0){
+						aPetsUsedCount[participant.companion.species] = 1;
+					} else {
+						aPetsUsedCount[participant.companion.species]++;
+				    }
+
+				})
+
+			});
+		})
+		
+		return aPetsUsedCount;
+	})
+
+}
+
 function getSummonerFromAPI(region, summonerId){
 
 	let link = SERVER_PATH + "get_api.php?region=" + region  + "&jsonSavePath=/summoners/" + summonerId + "&path=/tft/summoner/v1/summoners/" + summonerId;
 
-		$.ajax({
+		return $.ajax({
 			type: "GET",
 		  	url: link,
 		  	data: {
 	  	},
 	  	success: function(summonerAPIResult) {
 	  		console.log("API Sucesso obteve " + summonerId + " da API");
+	    	return JSON.parse(summonerAPIResult);
+	  	}
+
+	});
+
+}
+
+function getAPI(region, path, savePath){
+
+	let link = SERVER_PATH + "get_api.php?" +
+	                           "region=" + region + 
+							   "&jsonSavePath=" + savePath + 
+	                           "&path=" + path;
+
+		return $.ajax({
+			type: "GET",
+		  	url: link,
+		  	data: {
+	  	},
+	  	success: function(summonerAPIResult) {
+	  		console.log("GetAPI - Success - " + region + path + " salvando em " + savePath);
 	    	return JSON.parse(summonerAPIResult);
 	  	}
 

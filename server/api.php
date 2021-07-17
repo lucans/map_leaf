@@ -17,14 +17,20 @@ class API
 		
 			$url = "https://" . $this->region .
 					".api.riotgames.com" .
-					$this->path .
-					"?api_key=" . API_KEY;
+					$this->path;
+
+					if(strstr($url, '?')){
+						$url .= "&api_key=" . API_KEY;
+					} else {
+						$url .= "?api_key=" . API_KEY;
+					}
+					
 
 			ini_set("allow_url_fopen", 1);
 			
 			$json = file_get_contents($url);
 
-			if ($this->jsonSavePath) {
+			if (!empty($this->jsonSavePath)) {
 				$JSON = new JSON($this->jsonSavePath, $json);
 				$JSON->save();
 			}
