@@ -9,6 +9,10 @@
 	<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
 	<link rel="stylesheet" type="text/css" href="css/color.css">
 	<style type="text/css">
+		.site-theme-1{
+			background-color: #212121;
+			color: white;
+		}
 		.index-1100{
 			z-index: 1100;
 		}
@@ -33,7 +37,6 @@
 		    font-weight: bold;
 		    padding: 10px 0 10px 0;
 		    font-size: 1.2rem;
-		    background-color: #212121;
 	   	}
   
 	   	.ranking .title{
@@ -45,94 +48,122 @@
 	   		background-color: #f57f17;
 	   	} 
 	   	.accordion-item.br1 {
-	   		border-left: 1rem solid #f57f17 !important;
+	   		border-left: .4rem solid #f57f17 !important;
 		}	
 	   	.la1{
 	   		background-color: #4CAF50;
 		}	
 	   	.accordion-item.la1 {
-	   		border-left: 1rem solid #4CAF50 !important;
+	   		border-left: .4rem solid #4CAF50 !important;
 		}	
 	   	.la2{
 	   		background-color: #00bcd4;
 	   	}
 	   	.accordion-item.la2 {
-	   		border-left: 1rem solid #00bcd4 !important;
+	   		border-left: .4rem solid #00bcd4 !important;
 		}	
 	   	.na1{
 	   		background-color: #f4511e;
 	   	}
 	   	.accordion-item.na1 {
-	   		border-left: 1rem solid #f4511e !important;
+	   		border-left: .4rem solid #f4511e !important;
 		}	
 		.euw1{
 			background-color: #ea80fc;
 		}
 		.accordion-item.euw1 {
-			border-left: 1rem solid #ea80fc !important;
+			border-left: .4rem solid #ea80fc !important;
 		}	
 	   	.eun1{
 	   		background-color: #42a5f5;
 	   	}	
 	   	.accordion-item.eun1 {
-	   		border-left: 1rem solid #42a5f5 !important;
+	   		border-left: .4rem solid #42a5f5 !important;
 		}	
 		.ru{
 			background-color: #F44336;
 		}
 		.accordion-item.ru {
-			border-left: 1rem solid #F44336 !important;
+			border-left: .4rem solid #F44336 !important;
 		}	
 	   	.tr1{
 	   		background-color: #3f51b5;
 	   	}
 	   	.accordion-item.tr1 {
-	   		border-left: 1rem solid #3f51b5 !important;
+	   		border-left: .4rem solid #3f51b5 !important;
 		}	
 	   	.jp1{
 	   		background-color: #e91e63;
 	   	}
 	   	.accordion-item.jp1 {
-	   		border-left: 1rem solid #e91e63 !important;
+	   		border-left: .4rem solid #e91e63 !important;
 		}	
 	   	.kr{
 	   		background-color: #7c4dff;
 	   	}
 	   	.accordion-item.kr {
-	   		border-left: 1rem solid #7c4dff !important;
+	   		border-left: .4rem solid #7c4dff !important;
 		}	
 	   	.oc1{
 	   		background-color: #00897b;
 	   	}
 	   	.accordion-item.oc1 {
-	   		border-left: 1rem solid #00897b !important;
+	   		border-left: .4rem solid #00897b !important;
 		}	
 		.summoner-icon{
 			border-radius: 100%;
-			border: double 9px black;
+			/* border: double 9px black; */
 			padding: 1px;
 			background-clip: content-box; /* support: IE9+ */
 		}
 		.accordion-button{
 			padding: 1.2rem 2rem;
 		}
-		.card{
-			border-radius: none;
+		.card-group .card img{
+			width: 6rem;
+			height: auto;
+		}
+		.summoner-details .card img{
+			max-height: 10em;
+			min-height: 10em;
+			width: auto;
+		}
+		.clickable{
+			cursor: pointer;
+		}
+		.mt-6{
+			margin-top: 6rem;
 		}
 	</style>
 	<title>TFT HyperRoll - Ranking Server Regions</title>
 </head>
 
 <body>
+	
 	<div class="container-fluid">
 		<div class="row">
 
 			<div class="col-12 ps-5 pt-2 position-absolute index-1100">
 
+				<nav class="float-end col">
+					<div class="container-fluid">
+
+						<div class="input-group mb-1">
+							<input type="text" class="form-control" placeholder="Summoner name" aria-label="Text input with dropdown button">
+
+							<button class="btn btn-dark dropdown-toggle navbar-select-region-option text-uppercase bg-default" type="button" data-bs-toggle="dropdown" aria-expanded="false">BR1</button>
+							
+							<ul class="dropdown-menu dropdown-menu-end navbar-select-region"></ul>
+							<button class="btn btn-primary" type="submit">Search</button>
+						  </div>
+						  
+					</div>
+				</nav>
+
 			 	<div class="ranking col position-absolute animate__animated animate__bounceInLeft">		 	
-				 	<div class="title">
+				 	<div class="title site-theme-1">
 				 		<i class="fas fa-medal"></i> 
-				 		<label>Ranking Hyper Roll</label>
+				 		<label>Ranking Hyper Roll by Region</label>
 				 	</div>
 
 				 	<center>		 		
@@ -144,14 +175,18 @@
 					</div>
 			 	</div>
 
-			 	<div class="col sumonner-details float-end position-absolute animate__animated animate__bounceInRight" style="right: 1em;">
+			 	<div class="col sumonner-details mt-6 float-end position-absolute animate__animated" role="alert" style="right: 1em;">
 			 		<div class="card">
-					  
+						<div class="card-body">
+							<ul class="list-group" id="#summonerMatchsList">
+							</ul>
+						</div>
 					</div>
 			 	</div>
 			</div>
 
 			<div id="mapid">
+				
 			</div>
 
 		</div>
@@ -164,5 +199,9 @@
 <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js" integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA==" crossorigin=""></script>
 <script defer src="js/AnimatedMarker.js" type="text/javascript"></script>
 <script defer src="js/all.js" type="text/javascript"></script>
+
+<script defer src="js/class/region.js" type="text/javascript"></script>
+<script defer src="js/class/summoner.js" type="text/javascript"></script>
+<script defer src="js/class/hyperroll.js" type="text/javascript"></script>
 
 </html>
