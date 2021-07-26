@@ -1,11 +1,17 @@
 class Summoner{
 
 	constructor(region, id, puuid, index){
-		this.region = region;
+		
+		this.region = new Region(region);
 		this.id = id;
 		this.puuid = puuid;
 		this.index = index;
-		this.dataJson = new Array();
+		
+		this.getSummonerFromJSON()
+		.done(function(details){
+			this.data = details;
+		})
+		this.coordinates = this.region.getRandomJSONCoordinate(region);
 	}
     
 	zoom = function(){
@@ -50,9 +56,9 @@ class Summoner{
 	getSummonerFromJSON = function(){
 		
 		return $.getJSON("json/summoners/" + this.id.toLowerCase() + ".json", function(summonerJsonResult){
-			this.dataJson = summonerJsonResult;
+			return summonerJsonResult;
 		}).done(function(summonerJsonResult){
-			this.dataJson = summonerJsonResult;
+			return summonerJsonResult;
 		}).fail(function(summonerJsonResult){
 			return this.getSummonerFromAPI();
 		})
@@ -77,5 +83,23 @@ class Summoner{
 		});
 
 	}
+
+	setSummonersProfileIcon = function(){
+
+		$.getJSON("json/summoners/" + this.id.toLowerCase() + ".json", function(summonerJsonResult){
+		
+		}).done(function(summonerJsonResult){
+			$("img." + this.id).attr('src', SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + '.png')
+			$("img." + this.id).click(function(){
+				// getSummonerMatchsStats(region, summonerJsonResult.id, summonerJsonResult.puuid);
+				// setHTMLSummonerDetails(region, summonerJsonResult.id, summonerJsonResult.puuid);
+				$(".sumonner-details").fadeIn();
+			})
+		}).fail(function(summonerJsonResult){
+			this.getSummonerFromAPI();
+		})
+
+	}
+
     
 }
