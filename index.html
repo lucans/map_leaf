@@ -112,14 +112,8 @@
 		.accordion-button{
 			padding: 0.8rem 1rem;
 		}
-		.card-group .card img{
-			height: 6rem;
-			width: auto;
-		}
 		.summoner-details .card img{
-			max-height: 10em;
-			min-height: 10em;
-			width: auto;
+			max-width: 150px;
 		}
 		.clickable{
 			cursor: pointer;
@@ -129,6 +123,18 @@
 		}
 		.badge-rounded{
 			border-radius: 100%;
+		}
+		.ranking{
+			max-width: 470px;
+			min-width: 470px;
+		}
+		.tooltip-tft{
+			background-color: #202529;
+			color: white;
+			border: none;
+		}
+		.summoner-details .card .card-body{
+			padding: .5rem;
 		}
 	</style>
 	<title>TFT HyperRoll - Ranking Server Regions</title>
@@ -145,12 +151,13 @@
 					<div class="container-fluid">
 
 						<div class="input-group mb-1">
-							<input type="text" class="form-control" placeholder="Summoner name" aria-label="Text input with dropdown button">
+							<input type="text" class="form-control summoner-search-input" value="FÜS RO DAH" type="submit" placeholder="Summoner name">
 
-							<button class="btn btn-dark dropdown-toggle navbar-select-region-option text-uppercase bg-default" type="button" data-bs-toggle="dropdown" aria-expanded="false">BR1</button>
+							<button class="btn btn-dark dropdown-toggle navbar-select-region-option text-uppercase bg-default summoner-search-select-region" type="button" data-bs-toggle="dropdown" aria-expanded="false">BR1</button>
 							
 							<ul class="dropdown-menu dropdown-menu-end navbar-select-region"></ul>
-							<button class="btn btn-primary" type="submit">Search</button>
+							
+							<button class="btn btn-primary summoner-search-btn" type="submit">Search</button>
 						  </div>
 						  
 					</div>
@@ -158,35 +165,24 @@
 
 			 	<div class="ranking col position-absolute animate__animated animate__bounceInLeft">		 	
 
-						<center>		 		
-							<div class="spinner-border text-primary m-5" id="spinner-loading" role="status"></div>
+						<!-- <center>		 									
+							<i class="fas fa-cog fa-spin fs-2 m-4" id="spinner-ranking-regions"></i>
 						</center>
-						<!-- 
-							<div class="ranking-list accordion accordion-flush" id="accordionRankingRegion">
-								
-							</div> -->
-							
-						<table style="background-color:#0d202b" class="table table-striped animate__animated animate__bounceInLeft text-light" id="accordionRankingRegion">
-							<thead>
-								<tr>
-									<td class='fs-3 p-2'>
-										<i class="fas fa-chess-knight fs-2 m-2"></i>Hyper Roll Ranking
-									</td>		
-									<td></td>								
-									<td></td>								
-								</tr>
-																					
-							</thead>
-							<tbody class="table-dark">
+	 -->
+						<table class="table table-dark table-hover animate__animated animate__bounceInLeft" id="tableRankingRegion">							
+							<tbody class="">
 								
 							</tbody>
 						</table>
 
 			 	</div>
 
-			 	<div class="col summoner-details mt-6 float-end position-absolute animate__animated" role="alert" style="right: 1em;">
-			 		<div class="card">
-					
+			 	<div class="col summoner-details mt-5 float-end position-absolute animate__animated" role="alert" style="right: 1em;">
+					<div class="card bg-dark">
+						<div class="card-body"></div>
+						<center>		 		
+							<i class="fas fa-cog fa-spin fs-2 m-4 text-light" id="spinner-loading-summoner-stats"></i>
+						</center>
 					</div>
 			 	</div>
 			</div>
