@@ -5,7 +5,11 @@ class JSON
 	
 	function __construct($jsonSavePath, $json)
 	{
-		$this->serverPath = "C:/xampp/htdocs/map_leaf/json";
+		if(strstr($_SERVER['DOCUMENT_ROOT'], "localhost")){
+			$this->serverPath = "C:/xampp/htdocs/tft/json";
+		} else {
+			$this->serverPath = $_SERVER['DOCUMENT_ROOT'] . "/tft/json";
+		}
 		$this->jsonSavePath = $this->serverPath . strtolower($jsonSavePath);
 		$this->json = $json;
 	}

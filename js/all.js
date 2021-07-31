@@ -9,7 +9,7 @@ summonerDetails.hide();
 
 
 $(".summoner-search-btn").click(function() {
-	setHTMLSummonerDetailsByName(summonerSearchSelectRegion.text().toLowerCase(), summonerSearchInput.val().toLowerCase());	
+	setHTMLSummonerDetails(summonerSearchSelectRegion.text().toLowerCase(), "", "", summonerSearchInput.val().toLowerCase());	
 	// console.log(topOfTheWorld.sort(compareTopWorld));
 });
 
@@ -77,14 +77,18 @@ $(document).ready(function() {
 		generateStart()
 		.done(function(result){
 
-			
-			navbarStart(aRegions);		
+			navbarStart(aRegions);
 			
 			if(window.location.search.substr(1) != ''){
 				summonerSearchInput.val(unescape(decodeURIComponent(window.location.search.substr(1)))).promise().done(function() { 
-					setHTMLSummonerDetailsByName(summonerSearchSelectRegion.text().toLowerCase(), summonerSearchInput.val().toLowerCase())
-					.done(function(summoner) { 
-						setSummonerMarker(summonerSearchSelectRegion.text().toLowerCase(), summoner);
+					setHTMLSummonerDetails(summonerSearchSelectRegion.text().toLowerCase(), "", "", summonerSearchInput.val().toLowerCase())
+					.done(function(summoner) {
+						setSummonerMarker(summonerSearchSelectRegion.text().toLowerCase(), summoner)
+						.done(function() {
+							setHTMLTopSummoners(summonerSearchSelectRegion.text().toLowerCase());
+							$(".tr-summoner-" + summonerSearchSelectRegion.text().toLowerCase()).show();
+						})
+						
 					})
 				})
 			} else {			
@@ -472,98 +476,94 @@ function getNumberToK(n){
 
 function setHTMLSummonerDetails(region, summonerId, puuid, summonerName){
 
-	$.getJSON("json/summoners/" + summonerId + ".json", function(summonerJsonResult){
-
-	}).done(function(summonerJsonResult){
-
-		$(".summoner-details .card .card-body")
-		.empty()
-		.append("<center><img class='rounded-circle m-2 img-rounded clickable" + summonerJsonResult.id + " border-" + region + "' src='" + SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + ".png' alt='" +  summonerJsonResult.name + "'/></center>" +
-			"<div class='card-body text-center'>" +
-			"<span class='badge " + region + " text-uppercase m-1'>#" + region + "</span></p>" + 
-			"<p>" +
-				"<span class='badge " + region + " fs-5'>" + summonerJsonResult.name + "</span>" + 
-			"</p>" +
-			"<span class='badge " + region + " fs-6'>Level: " + summonerJsonResult.summonerLevel + "</span>" +				
-			"<center><button type='button' class='btn btn-sm m-2 btn-secondary btn-summoner-get-matchs " + summonerJsonResult.id + "'>Get last matchs</button></center>" +
-				"<table class='table table-striped table-dark text-left animate__animated animate__bounceInLeft' id='summonerStats'>" +
-					"<thead>" +						
-					"</thead>" +
-					
-					"<tbody>" +
-					"</tbody>" +
-				"</table>" +
-			"</div>"
-		).promise().done(function() {
-			$("button.btn-summoner-get-matchs." + summonerJsonResult.id).click(function() {
-				spinnerSummonerDetails.show();
-				setHTMLSummonerLastMatchs(region, summonerJsonResult.id, summonerJsonResult.puuid);
-			})
-		})
+	if(summonerId){
 		
-	}).fail(function(){
+		return getSummonerFromAPI(region, summonerId, summonerName)
+		.done(function(summonerJsonResult){
+
+			summonerJsonResult = JSON.parse(summonerJsonResult);
+
+			$(".summoner-details .card .card-body")
+			.empty()
+			.append("<center><img class='rounded-circle m-2 img-rounded clickable" + summonerJsonResult.id + " border-" + region + "' src='" + SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + ".png' alt='" +  summonerJsonResult.name + "'/></center>" +
+				"<div class='card-body text-center'>" +
+				"<span class='badge " + region + " text-uppercase m-1'>#" + region + "</span></p>" + 
+				"<p>" +
+					"<span class='badge " + region + " fs-5'>" + summonerJsonResult.name + "</span>" + 
+				"</p>" +
+				"<span class='badge " + region + " fs-6'>Level: " + summonerJsonResult.summonerLevel + "</span>" +				
 				
-		return getSummonerFromAPI(region, summonerId)
-		.done(function(aSummonerSearchBar){					
-			return aSummonerSearchBar;
-		})
+					"<table class='table table-striped table-dark text-left animate__animated animate__bounceInLeft' id='summonerStats'>" +
+						"<thead>" +						
+						"</thead>" +
+						
+						"<tbody>" +
+						"</tbody>" +
+					"</table>" +
+				"</div>"
+			)
+
+			spinnerSummonerDetails.show();
+			setHTMLSummonerLastMatchs(region, summonerJsonResult.id, summonerJsonResult.puuid);
 			
-	}).always(function() {
-		
-		spinnerSummonerDetails.hide();
-		summonerDetails.fadeIn();
-		
-	})
+			return summonerJsonResult;
 
-}
-
-function setHTMLSummonerDetailsByName(region, summonerName){
-
-	return $.getJSON("json/summoners/byname/" + escape(encodeURIComponent(summonerName)) + ".json", function(summonerJsonResult){
-		
-	}).done(function(summonerJsonResult){
-		
-		$(".summoner-details .card .card-body")
-		.empty()
-		.append("<center><img class='rounded-circle m-2 img-rounded clickable" + summonerJsonResult.id + " border-" + region + "' src='" + SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + ".png' alt='" +  summonerJsonResult.name + "'/></center>" +
-			"<div class='card-body text-center'>" +
-			"<span class='badge " + region + " text-uppercase m-1'>#" + region + "</span></p>" + 
-			"<p>" +
-				"<span class='badge " + region + " fs-5'>" + summonerJsonResult.name + "</span>" + 
-			"</p>" +
-			"<span class='badge " + region + " fs-6'>Level: " + summonerJsonResult.summonerLevel + "</span>" +	
-			"<center><button type='button' class='btn btn-sm btn-secondary m-2 btn-summoner-get-matchs " + summonerJsonResult.id + "'>Get last matchs</button></center>" +
-				"<table class='table table-striped table-dark text-left animate__animated animate__bounceInLeft' id='summonerStats'>" +
-					"<thead>" + 							
-					"</thead>" +
+		}).fail(function(){
 					
-					"<tbody>" +
-					"</tbody>" +
-				"</table>" +
-			"</div>"
-		).promise().done(function() {		
-			$("button.btn-summoner-get-matchs." + summonerJsonResult.id).click(function() {			
-				spinnerSummonerDetails.show();
-				setHTMLSummonerLastMatchs(region, summonerJsonResult.id);
-			})
-		})
-
-		return summonerJsonResult;
-		
-	}).fail(function(){
-		
-		let path = "/tft/summoner/v1/summoners/by-name/" + escape(encodeURIComponent(summonerName));
-		let savePath = "/summoners/byname/" +  escape(encodeURIComponent(summonerName));
-		
-		return getAPI(region, path, savePath)
+			return getSummonerFromAPI(region, summonerId)
 			.done(function(aSummonerSearchBar){					
 				return aSummonerSearchBar;
 			})
+				
+		}).always(function() {
+			
+			spinnerSummonerDetails.hide();
+			summonerDetails.fadeIn();
+			
+		})
 
-	}).always(function() {	
-		spinnerSummonerDetails.hide();
-		summonerDetails.fadeIn();		
-	})
+	} else if(summonerName) {
+
+		let path = "/tft/summoner/v1/summoners/by-name/" + escape(encodeURIComponent(summonerName));
+		let savePath = "/summoners/byname/" +  escape(encodeURIComponent(summonerName));
+		
+		return getSummonerFromAPI(region, '', summonerName)
+		.done(function(summonerJsonResult){
+			
+			summonerJsonResult = JSON.parse(summonerJsonResult);
+
+			$(".summoner-details .card .card-body")
+			.empty()
+			.append("<center><img class='rounded-circle m-2 img-rounded clickable" + summonerJsonResult.id + " border-" + region + "' src='" + SUMMONER_ICON_PATH + summonerJsonResult.profileIconId + ".png' alt='" +  summonerJsonResult.name + "'/></center>" +
+				"<div class='card-body text-center'>" +
+				"<span class='badge " + region + " text-uppercase m-1'>#" + region + "</span></p>" + 
+				"<p>" +
+					"<span class='badge " + region + " fs-5'>" + summonerJsonResult.name + "</span>" + 
+				"</p>" +
+				"<span class='badge " + region + " fs-6'>Level: " + summonerJsonResult.summonerLevel + "</span>" +	
+				
+					"<table class='table table-striped table-dark text-left animate__animated animate__bounceInLeft' id='summonerStats'>" +
+						"<thead>" + 							
+						"</thead>" +
+						
+						"<tbody>" +
+						"</tbody>" +
+					"</table>" +
+				"</div>"
+			);
+	
+			setHTMLSummonerLastMatchs(region, summonerJsonResult.id, summonerJsonResult.puuid);
+			spinnerSummonerDetails.show();
+		
+			return summonerJsonResult;
+			
+		}).fail(function(){
+		}).always(function() {
+			spinnerSummonerDetails.hide();
+			summonerDetails.fadeIn();
+		})
+
+	}
 
 }
 
@@ -755,83 +755,54 @@ function zoomMapIn(lat, lon, zoom){
 	mymap.flyTo([lat, lon], zoom);
 }
 
-function getSummonerMatchsStats(region, summonerId, puuid, limitMatchs = 5){
+function getSummonerFromAPI(region, summonerId, summonerName){
 
-	let path = "/tft/match/v1/matches/by-puuid/" + puuid + "/ids?count=" + limitMatchs;
-	let regionPath = getAreaInfo(region, 'region_path');
-    let aPetsUsed = new Array();
-    let aPetsUsedCount = new Array();
-	var dfd = jQuery.Deferred();
+	let link = '';
+	let path = '';
+	let savePath = '';
 
-	return getAPI(regionPath, path)
-	.done(function(aMatchsResult){
-		JSON.parse(aMatchsResult).forEach(function(match, index){
-			getAPI(regionPath, '/tft/match/v1/matches/' + match)
-			.done(function(aMatchResult){
+	if(summonerName){
 
-			    JSON.parse(aMatchResult).info.participants.forEach(function(participant, index){
-				    
-					aPetsUsedCount[participant.companion.species] = new Int32Array;
+		path = "/tft/summoner/v1/summoners/by-name/" + escape(encodeURIComponent(summonerName));
+		savePath = "/summoners/byname/" +  escape(encodeURIComponent(summonerName));		
+		link = SERVER_PATH + "get_api.php?region=" + region + 
+			"&jsonSavePath=" + savePath +
+			"&path=" + path;
 
-                    if(aPetsUsed.indexOf(participant.companion.species) < 0){
-						aPetsUsedCount[participant.companion.species] = 1;
-					} else {
-						aPetsUsedCount[participant.companion.species]++;
-				    }
+	} else {
 
-				})
+		path = "/tft/summoner/v1/summoners/" + summonerId;
+		savePath = "/summoners/" + summonerId;	
+		link = SERVER_PATH + "get_api.php?region=" + region  + 
+			"&jsonSavePath=" + savePath + 
+			"&path=" + path;
 
-			});
-		})
-		
-		return aPetsUsedCount;
-	}).always(function() { 
-		spinnerSummonerDetails.hide();
-	 })
+	}
 
-}
-
-function getSummonerFromAPI(region, summonerId){
-
-	let link = SERVER_PATH + "get_api.php?region=" + region  + "&jsonSavePath=/summoners/" + summonerId + "&path=/tft/summoner/v1/summoners/" + summonerId;
-
-		return $.ajax({
-			type: "GET",
-		  	url: link,
-		  	data: {
-	  	},
-	  	success: function(summonerAPIResult) {
-	  		console.log("API Success get " + summonerId + " from API in " + region);
-			  return JSON.parse(summonerAPIResult);
-			},
-		fail: function(summonerAPIResult){
-			console.log("FAIL API getting " + summonerId + " from API in " + region);
-		}
-
-	});
+	return getAPI(region, path, savePath).done(function(summonerAPIResult) {
+		return summonerAPIResult;
+	})
 
 }
 
 function getAPI(region, path, savePath){
 
-
-
 	let link = SERVER_PATH + "get_api.php?" +
 	                           "region=" + region + 
 							   "&jsonSavePath=" + savePath + 
-	                           "&path=" + path;
+							"&path=" + path;
 
-		return $.ajax({
-			type: "GET",
-		  	url: link,
-		  	data: {
-	  	},
-	  	success: function(summonerAPIResult) {
-	  		console.log("GetAPI - Success " + region + path + " salvando em " + savePath);
-	    	return JSON.parse(summonerAPIResult);
-	  	}
+	return $.ajax({
+		type: "GET",
+		url: link,
+		data: {
+	},
+	success: function(summonerAPIResult) {
+		console.log("GetAPI - Success " + region + path + " salvando em " + savePath);
+		return JSON.parse(summonerAPIResult);
+	}
 
-	});
+});
 
 }
 
@@ -855,7 +826,9 @@ function getHyperRollFromAPI(region){
 }
 
 function setSummonerMarker(region, summoner){
-			
+
+	summoner = JSON.parse(summoner);
+
 	let randomCoordinate = getRandomJSONCoordinate(region);
 	
 	let iconStyle = L.icon({
@@ -870,10 +843,11 @@ function setSummonerMarker(region, summoner){
 	
 	marker.bindTooltip("<span class='fs-6'>" + summoner.name + "</span>", {permanent: true, direction: 'bottom', className: 'tooltip-tft'}).openTooltip();
 
-	$("img.leaflet-marker-icon." + summoner.id).click(function() { 
-		zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, 8);
+	return $("img.leaflet-marker-icon." + summoner.id).click(function() { 
+		zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, 6);
+	}).promise().done(function() { 		
+		zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, 6);
 	})
 
-	zoomMapIn(randomCoordinate.lat, randomCoordinate.lon, 8);
 
 }

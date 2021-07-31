@@ -18,5 +18,4 @@ try{
 	echo ($API->finalResult);
 }
 
-
 ?>
